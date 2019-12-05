@@ -58,6 +58,9 @@
 
 <script>
 import './../assets/css/datepicker.css'
+import MonthUtil from './../assets/js/monthUtil'
+import DayUtil from './../assets/js/dayUtil'
+import CalenderDate from './../assets/js/calenderDate'
 
 export default {
   props: {
@@ -73,21 +76,7 @@ export default {
       pageMode: null,
       modes: ['day', 'month', 'year'],
       select: {},
-      container: null,
-      months: [
-        { Jan: 31 },
-        { Feb: 28 },
-        { Mar: 31 },
-        { Apr: 30 },
-        { May: 31 },
-        { Jun: 30 },
-        { Jul: 31 },
-        { Aug: 31 },
-        { Sep: 30 },
-        { Oct: 31 },
-        { Nov: 30 },
-        { Dec: 31 }
-      ]
+      container: null
     }
   },
   watch: {
@@ -103,7 +92,7 @@ export default {
 
     this.refreshSelectDate(this.today)
 
-    this.calendarTitle = `${this.month2Src(this.select.month)} ${
+    this.calendarTitle = `${MonthUtil.month2Src(this.select.month)} ${
       this.select.year
     }`
 
@@ -117,29 +106,17 @@ export default {
         currParsedTitle.month,
         Object.is('left', direction) ? -1 : 1
       )
-      const monthSrc = this.month2Src(lastYearMonth.month)
+      const monthSrc = MonthUtil.month2Src(lastYearMonth.month)
       this.calendarTitle = `${monthSrc} ${lastYearMonth.year}`
       this.fillDays()
     },
     toggleTitle() {
+      // if (Object.is(this.pageMode, 'days')) {
+      // }
       this.pageMode = 'month'
       this.calendarTitle = this.parseCalendarTitle().year
-      this.fillMonths()
-    },
-    isToday(y, m, d) {
-      const todayY = this.today.getFullYear()
-      const todayM = this.today.getMonth() + 1
-      const todayD = this.today.getDate()
-      return (
-        Object.is(y, todayY) && Object.is(m, todayM) && Object.is(d, todayD)
-      )
-    },
-    isActiveDate(y, m, d) {
-      return (
-        Object.is(this.select.year, y) &&
-        Object.is(this.select.month, m) &&
-        Object.is(this.select.day, d)
-      )
+      // this.fillMonths()
+      this.container = MonthUtil.fillMonths(this.select)
     },
     refreshSelectDate(date) {
       this.select = {
@@ -172,29 +149,15 @@ export default {
 
       this.refreshSelectDate(toogleDate)
     },
-    fillMonths() {
-      this.container = [[], [], []]
-      for (let i = 0, month = 1; i < 3 || month < this.months.length + 1; i++) {
-        for (let j = 0; j < 4; j++, month++) {
-          this.container[i][j] = new CalenderDate(
-            this.select.year,
-            this.month2Src(month),
-            this.select.day,
-            'black',
-            Object.is(month, this.select.month)
-          )
-        }
-      }
-    },
     fillDays() {
       const parsedCalendar = this.parseCalendarTitle()
       const year = parsedCalendar.year
       const month = parsedCalendar.month
       const indexOfWeek = new Date(year, month - 1, 1).getDay()
-      const daysInMonth = this.getEndDayInMonth(year, month)
+      const daysInMonth = MonthUtil.getEndDayInMonth(year, month)
       const lastYearMonth = this.getRelativeYearMonth(year, month, -1)
       const nextYearMonth = this.getRelativeYearMonth(year, month, +1)
-      const daysInLastMonth = this.getEndDayInMonth(
+      const daysInLastMonth = MonthUtil.getEndDayInMonth(
         lastYearMonth.year,
         lastYearMonth.month
       )
@@ -217,10 +180,11 @@ export default {
                 lastYearMonth.month,
                 lastDay,
                 'gray',
-                this.isActiveDate(
+                DayUtil.isActiveDate(
                   lastYearMonth.year,
                   lastYearMonth.month,
-                  lastDay
+                  lastDay,
+                  this.select
                 )
               )
             } else {
@@ -228,8 +192,10 @@ export default {
                 year,
                 month,
                 thisDay,
-                this.isToday(year, month, thisDay) ? '#db3d44' : 'black',
-                this.isActiveDate(year, month, thisDay)
+                DayUtil.isToday(year, month, thisDay, this.today)
+                  ? '#db3d44'
+                  : 'black',
+                DayUtil.isActiveDate(year, month, thisDay, this.select)
               )
               thisDay++
             }
@@ -243,10 +209,11 @@ export default {
                 nextYearMonth.month,
                 nextDay,
                 'gray',
-                this.isActiveDate(
+                DayUtil.isActiveDate(
                   nextYearMonth.year,
                   nextYearMonth.month,
-                  nextDay
+                  nextDay,
+                  this.select
                 )
               )
               nextDay++
@@ -255,8 +222,10 @@ export default {
                 year,
                 month,
                 thisDay,
-                this.isToday(year, month, thisDay) ? '#db3d44' : 'black',
-                this.isActiveDate(year, month, thisDay)
+                DayUtil.isToday(year, month, thisDay, this.today)
+                  ? '#db3d44'
+                  : 'black',
+                DayUtil.isActiveDate(year, month, thisDay, this.select)
               )
             }
           }
@@ -269,56 +238,19 @@ export default {
       const monthSrc = titleDateArray[0]
       return {
         year: parseInt(year),
-        month: this.src2Month(monthSrc)
+        month: MonthUtil.src2Month(monthSrc)
       }
-    },
-    src2Month(monthSrc) {
-      for (let i = 0; i < this.months.length; i++) {
-        if (Object.is(Object.keys(this.months[i])[0], monthSrc)) {
-          return i + 1
-        }
-      }
-    },
-    month2Src(month) {
-      return Object.keys(this.months[month - 1])[0]
-    },
-    getEndDayInMonth(year, month) {
-      return Object.is(year % 4, 0) && Object.is(month, 2)
-        ? Object.values(this.months[month - 1])[0] + 1
-        : Object.values(this.months[month - 1])[0]
     },
     getRelativeYearMonth(year, month, index) {
       if (index) {
         month = month + index
       }
       const date = new Date(year, month - 1)
-
-      // if (Object.is(1, month)) {
-      //   year = year - 1
-      //   month = 12
-      // } else if () {
-
-      // }
-
-      // else {
-      //   month = month - 1
-      // }
-
       return {
         year: date.getFullYear(),
         month: date.getMonth() + 1
       }
     }
-  }
-}
-
-class CalenderDate {
-  constructor(y, m, d, color, isActive) {
-    this.year = y
-    this.month = m
-    this.day = d
-    this.color = color
-    this.isActive = isActive ? isActive : false
   }
 }
 </script>
