@@ -15,6 +15,7 @@ module.exports = {
 
   rules: {
     'no-undef': 'off',
+    'no-console': "off",
     'no-unused-vars': 'off',
     'vue/no-unused-components': 'off',
     'vue/this-in-template': 'off',

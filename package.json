@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.4.3",
+    "@fortawesome/fontawesome-free": "^5.11.2",
     "vue": "^2.6.10"
   },
   "devDependencies": {
