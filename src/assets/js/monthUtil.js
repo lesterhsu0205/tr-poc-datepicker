@@ -1,7 +1,6 @@
 import CalenderDate from './calenderDate'
 
 export default class MonthUtil {
-
   static months = [
     { Jan: 31 },
     { Feb: 28 },
@@ -23,6 +22,7 @@ export default class MonthUtil {
       for (let j = 0; j < 4; j++, month++) {
         container[i][j] = new CalenderDate(
           selectDate.year,
+          month,
           this.month2Src(month),
           selectDate.day,
           'black',
@@ -50,5 +50,4 @@ export default class MonthUtil {
       ? Object.values(this.months[month - 1])[0] + 1
       : Object.values(this.months[month - 1])[0]
   }
-
 }

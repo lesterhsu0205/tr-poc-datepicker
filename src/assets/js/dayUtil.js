@@ -1,4 +1,5 @@
 import CalenderDate from './calenderDate'
+import MonthUtil from './monthUtil'
 
 export default class DayUtil {
   static isToday(y, m, d, today) {
@@ -14,5 +15,96 @@ export default class DayUtil {
       Object.is(selectedDate.month, m) &&
       Object.is(selectedDate.day, d)
     )
+  }
+
+  static fillDays(
+    parsedCalendar,
+    indexOfWeek,
+    daysInMonth,
+    lastYearMonth,
+    nextYearMonth,
+    today,
+    selectedDate
+  ) {
+    const year = parsedCalendar.year
+    const month = parsedCalendar.month
+    const monthSrc = parsedCalendar.monthSrc
+
+    const daysInLastMonth = MonthUtil.getEndDayInMonth(
+      lastYearMonth.year,
+      lastYearMonth.month
+    )
+
+    let container = [[], [], [], [], [], []]
+
+    for (
+      let i = 0, thisDay = 1, nextDay = 1;
+      thisDay < daysInMonth + 1 || i < 6;
+      i++
+    ) {
+      if (Object.is(i, 0)) {
+        // 第一個禮拜
+        for (let j = 0; j < 7; j++) {
+          //如果該月份不是從禮拜日開始填，則填上一個月的尾
+          if (j < indexOfWeek) {
+            let lastDay = daysInLastMonth - indexOfWeek + j + 1
+            container[i][j] = new CalenderDate(
+              lastYearMonth.year,
+              lastYearMonth.month,
+              MonthUtil.month2Src(lastYearMonth.month),
+              lastDay,
+              'gray',
+              this.isActiveDate(
+                lastYearMonth.year,
+                lastYearMonth.month,
+                lastDay,
+                selectedDate
+              )
+            )
+          } else {
+            container[i][j] = new CalenderDate(
+              year,
+              month,
+              monthSrc,
+              thisDay,
+              this.isToday(year, month, thisDay, today) ? '#db3d44' : 'black',
+              this.isActiveDate(year, month, thisDay, selectedDate)
+            )
+            thisDay++
+          }
+        }
+      } else {
+        for (let j = 0; j < 7; j++, thisDay++) {
+          // 補下個月
+          if (thisDay > daysInMonth) {
+            container[i][j] = new CalenderDate(
+              nextYearMonth.year,
+              nextYearMonth.month,
+              MonthUtil.month2Src(nextYearMonth.month),
+              nextDay,
+              'gray',
+              this.isActiveDate(
+                nextYearMonth.year,
+                nextYearMonth.month,
+                nextDay,
+                selectedDate
+              )
+            )
+            nextDay++
+          } else {
+            container[i][j] = container[i][j] = new CalenderDate(
+              year,
+              month,
+              monthSrc,
+              thisDay,
+              this.isToday(year, month, thisDay, today) ? '#db3d44' : 'black',
+              this.isActiveDate(year, month, thisDay, selectedDate)
+            )
+          }
+        }
+      }
+    }
+
+    return container
   }
 }

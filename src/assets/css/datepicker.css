@@ -39,6 +39,7 @@ tbody > tr > td {
   cursor: pointer;
 }
 
+tbody > tr > td.focus:before,
 tbody > tr > td:hover:before {
   position: absolute;
   content: '';
@@ -51,25 +52,8 @@ tbody > tr > td:hover:before {
   z-index: 11;
 }
 
+tbody > tr > td.focus > .day,
 tbody > tr > td:hover > .day {
-  position: relative;
-  color: white !important;
-  z-index: 12;
-}
-
-tbody > tr > td.focus:before {
-  position: absolute;
-  content: '';
-  width: 24px;
-  height: 24px;
-  border-radius: 20px;
-  top: 5px;
-  left: 5px;
-  background-color: #db3d44;
-  z-index: 11;
-}
-
-tbody > tr > td.focus > .day {
   position: relative;
   color: white !important;
   z-index: 12;
@@ -80,13 +64,4 @@ tbody > tr > td.focus > .day {
   height: 32px;
   text-align: center;
   line-height: 32px;
-}
-
-.cancelArea {
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  top: 0;
-  left: 0;
-  z-index: 9;
 }
