@@ -126,7 +126,15 @@ export default {
     },
     togglePage(direction) {
       if (Object.is(this.pageMode, 'year')) {
-        // TODO
+        const title = this.calendarTitle.split(' - ')
+        const from = title[0]
+        const to = title[1]
+        const refDate = {
+          year: Object.is('left', direction)
+            ? parseInt(from) - 9
+            : parseInt(to) + 9
+        }
+        this.replacePage('year', refDate)
       } else if (Object.is(this.pageMode, 'month')) {
         const year = parseInt(this.calendarTitle)
 
@@ -161,7 +169,10 @@ export default {
       this.container[0].splice(0, 0)
 
       if (Object.is(this.pageMode, 'year')) {
-        // TODO
+        const refDate = {
+          year: calendarDate.year
+        }
+        this.replacePage('month', refDate)
       } else if (Object.is(this.pageMode, 'month')) {
         const refDate = {
           year: calendarDate.year,
