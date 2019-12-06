@@ -16,17 +16,17 @@ export default class MonthUtil {
     { Dec: 31 }
   ]
 
-  static fillMonths(selectDate) {
+  static fillMonths(refDate, selectedDate) {
     let container = [[], [], []]
     for (let i = 0, month = 1; i < 3 || month < this.months.length + 1; i++) {
       for (let j = 0; j < 4; j++, month++) {
         container[i][j] = new CalenderDate(
-          selectDate.year,
+          refDate.year,
           month,
           this.month2Src(month),
-          selectDate.day,
+          1,
           'black',
-          Object.is(month, selectDate.month)
+          Object.is(month, selectedDate.month)
         )
       }
     }

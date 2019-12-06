@@ -59,7 +59,6 @@
 <script>
 import './../assets/css/datepicker.css'
 import MonthUtil from './../assets/js/monthUtil'
-import DaysUtil from './../assets/js/dayUtil'
 import DayUtil from './../assets/js/dayUtil'
 import CalenderDate from './../assets/js/calenderDate'
 
@@ -89,69 +88,67 @@ export default {
   mounted: function() {
     this.today = new Date()
     this.refreshSelectedDate(this.today)
-    this.changeMode('day')
+    this.replacePage('day', this.selectedDate)
   },
   methods: {
-    changeMode(targetMode, refDate) {
+    replacePage(targetMode, refDate) {
       this.pageMode = targetMode
-
-      if (!refDate) {
-        refDate = this.selectedDate
-      }
 
       if (Object.is('year', targetMode)) {
         console.log('TODO')
       } else if (Object.is('month', targetMode)) {
         this.calendarTitle = `${refDate.year}`
-        this.container = MonthUtil.fillMonths(refDate)
+        this.container = MonthUtil.fillMonths(refDate, this.selectedDate)
       } else if (Object.is('day', targetMode)) {
-        this.calendarTitle = `${refDate.monthSrc} ${refDate.year}`
+        this.calendarTitle = `${MonthUtil.month2Src(refDate.month)} ${
+          refDate.year
+        }`
         this.fillDays()
       }
     },
     togglePage(direction) {
-      const currParsedTitle = this.parseCalendarTitle()
-      const lastYearMonth = this.getRelativeYearMonth(
-        currParsedTitle.year,
-        currParsedTitle.month,
-        Object.is('left', direction) ? -1 : 1
-      )
-      const monthSrc = MonthUtil.month2Src(lastYearMonth.month)
-      this.calendarTitle = `${monthSrc} ${lastYearMonth.year}`
-      this.fillDays()
+      if (Object.is(this.pageMode, 'year')) {
+        // console.log('todo')
+      } else if (Object.is(this.pageMode, 'month')) {
+        const year = parseInt(this.calendarTitle)
+
+        const refDate = {
+          year: Object.is('left', direction) ? year - 1 : year + 1
+          // month: this.selectedDate.month,
+          // monthSrc: this.selectedDate.monthSrc,
+          // day: 1
+        }
+
+        this.replacePage('month', refDate)
+      } else if (Object.is(this.pageMode, 'day')) {
+        const currParsedTitle = this.parseCalendarTitle()
+        const lastYearMonth = this.getRelativeYearMonth(
+          currParsedTitle.year,
+          currParsedTitle.month,
+          Object.is('left', direction) ? -1 : 1
+        )
+        this.replacePage('day', {
+          year: lastYearMonth.year,
+          month: lastYearMonth.month
+        })
+      }
     },
     toggleTitle() {
-      const calendarTitle = this.parseCalendarTitle()
-
-      let refDate
-
-      if (
-        this.selectedDate &&
-        this.selectedDate.year &&
-        this.selectedDate.month &&
-        this.selectedDate.monthSrc &&
-        this.selectedDate.day
-      ) {
-        refDate = this.selectedDate
-      } else {
-        refDate = {
+      if (Object.is(this.pageMode, 'month')) {
+        // this.replacePage('year')
+      } else if (Object.is(this.pageMode, 'day')) {
+        // 參考 title
+        const calendarTitle = this.parseCalendarTitle()
+        let refDate = {
           year: calendarTitle.year,
           month: calendarTitle.month,
           monthSrc: calendarTitle.monthSrc,
-          day: 1
+          day: this.selectedDate.day ? this.selectedDate.day : 1
         }
-      }
-
-      if (Object.is(this.pageMode, 'month')) {
-        this.changeMode('year', refDate)
-      } else if (Object.is(this.pageMode, 'day')) {
-        this.changeMode('month', refDate)
+        this.replacePage('month', refDate)
       }
     },
     toggle(calendarDate) {
-      // const toggleVal = event.target.textContent
-      // event.target.parentNode.classList.toggle('focus')
-
       for (let i = 0; i < this.container.length; i++) {
         for (let j = 0; j < this.container[i].length; j++) {
           this.container[i][j].isActive = false
@@ -163,48 +160,33 @@ export default {
       // fetch array in vue
       this.container[0].splice(0, 0)
 
-      const toogleDate = new Date(
-        calendarDate.year,
-        calendarDate.month - 1,
-        calendarDate.day
-      )
-
-      this.refreshSelectedDate(toogleDate)
-
       if (Object.is(this.pageMode, 'year')) {
-        this.changeMode('month')
+        // this.replacePage('month')
       } else if (Object.is(this.pageMode, 'month')) {
-        this.changeMode('day')
-      }
-    },
-    processCallByMode(call) {
-      if (Object.is('day', this.pageMode) && call) {
-        call()
-      } else if (Object.is('month', this.pageMode) && call) {
-        call()
-      } else if (Object.is('year', this.pageMode) && call) {
-        call()
+        // this.replacePage('month')
+        const refDate = {
+          year: calendarDate.year,
+          month: calendarDate.month
+        }
+        this.replacePage('day', refDate)
+      } else if (Object.is(this.pageMode, 'day')) {
+        const toogleDate = new Date(
+          calendarDate.year,
+          calendarDate.month - 1,
+          calendarDate.day
+        )
+        this.refreshSelectedDate(toogleDate)
       }
     },
     refreshSelectedDate(date) {
-      this.selectedDate.year = date.getFullYear()
-
-      if (this.pageMode == null || Object.is('day', this.pageMode)) {
+      if (date instanceof Date) {
+        this.selectedDate.year = date.getFullYear()
         this.selectedDate.month = date.getMonth() + 1
         this.selectedDate.monthSrc = MonthUtil.month2Src(
           this.selectedDate.month
         )
         this.selectedDate.day = date.getDate()
         this.selectedDate.dayOfTheWeek = date.getDay() // Sunday - Saturday : 0 - 6
-      }
-
-      if (Object.is('month', this.pageMode)) {
-        this.selectedDate.month = date.getMonth() + 1
-        this.selectedDate.monthSrc = MonthUtil.month2Src(
-          this.selectedDate.month
-        )
-        this.selectedDate.day = ''
-        this.selectedDate.dayOfTheWeek = ''
       }
     },
     fillDays() {
@@ -216,7 +198,7 @@ export default {
       const lastYearMonth = this.getRelativeYearMonth(year, month, -1)
       const nextYearMonth = this.getRelativeYearMonth(year, month, +1)
 
-      this.container = DaysUtil.fillDays(
+      this.container = DayUtil.fillDays(
         parsedCalendar,
         indexOfWeek,
         daysInMonth,
@@ -225,6 +207,9 @@ export default {
         this.today,
         this.selectedDate
       )
+    },
+    clearSelectedDate() {
+      this.selectedDate = {}
     },
     parseCalendarTitle() {
       const titleDateArray = this.calendarTitle.split(' ')
