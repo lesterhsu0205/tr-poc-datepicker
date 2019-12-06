@@ -58,6 +58,7 @@
 
 <script>
 import './../assets/css/datepicker.css'
+import YearUtil from './../assets/js/yearUtil'
 import MonthUtil from './../assets/js/monthUtil'
 import DayUtil from './../assets/js/dayUtil'
 import CalenderDate from './../assets/js/calenderDate'
@@ -95,7 +96,9 @@ export default {
       this.pageMode = targetMode
 
       if (Object.is('year', targetMode)) {
-        console.log('TODO')
+        const bound = YearUtil.getYearBound(refDate.year)
+        this.calendarTitle = `${bound.lower} - ${bound.upper}`
+        this.container = YearUtil.fillYears(bound, this.selectedDate)
       } else if (Object.is('month', targetMode)) {
         this.calendarTitle = `${refDate.year}`
         this.container = MonthUtil.fillMonths(refDate, this.selectedDate)
@@ -106,23 +109,35 @@ export default {
         this.fillDays()
       }
     },
+    toggleTitle() {
+      if (Object.is(this.pageMode, 'month')) {
+        this.replacePage('year', { year: parseInt(this.calendarTitle) })
+      } else if (Object.is(this.pageMode, 'day')) {
+        // 參考 title
+        const calendarTitle = DayUtil.parseCalendarTitle(this.calendarTitle)
+        let refDate = {
+          year: calendarTitle.year,
+          month: calendarTitle.month,
+          monthSrc: calendarTitle.monthSrc,
+          day: this.selectedDate.day ? this.selectedDate.day : 1
+        }
+        this.replacePage('month', refDate)
+      }
+    },
     togglePage(direction) {
       if (Object.is(this.pageMode, 'year')) {
-        // console.log('todo')
+        // TODO
       } else if (Object.is(this.pageMode, 'month')) {
         const year = parseInt(this.calendarTitle)
 
         const refDate = {
           year: Object.is('left', direction) ? year - 1 : year + 1
-          // month: this.selectedDate.month,
-          // monthSrc: this.selectedDate.monthSrc,
-          // day: 1
         }
 
         this.replacePage('month', refDate)
       } else if (Object.is(this.pageMode, 'day')) {
-        const currParsedTitle = this.parseCalendarTitle()
-        const lastYearMonth = this.getRelativeYearMonth(
+        const currParsedTitle = DayUtil.parseCalendarTitle(this.calendarTitle)
+        const lastYearMonth = DayUtil.getRelativeYearMonth(
           currParsedTitle.year,
           currParsedTitle.month,
           Object.is('left', direction) ? -1 : 1
@@ -131,21 +146,6 @@ export default {
           year: lastYearMonth.year,
           month: lastYearMonth.month
         })
-      }
-    },
-    toggleTitle() {
-      if (Object.is(this.pageMode, 'month')) {
-        // this.replacePage('year')
-      } else if (Object.is(this.pageMode, 'day')) {
-        // 參考 title
-        const calendarTitle = this.parseCalendarTitle()
-        let refDate = {
-          year: calendarTitle.year,
-          month: calendarTitle.month,
-          monthSrc: calendarTitle.monthSrc,
-          day: this.selectedDate.day ? this.selectedDate.day : 1
-        }
-        this.replacePage('month', refDate)
       }
     },
     toggle(calendarDate) {
@@ -161,9 +161,8 @@ export default {
       this.container[0].splice(0, 0)
 
       if (Object.is(this.pageMode, 'year')) {
-        // this.replacePage('month')
+        // TODO
       } else if (Object.is(this.pageMode, 'month')) {
-        // this.replacePage('month')
         const refDate = {
           year: calendarDate.year,
           month: calendarDate.month
@@ -190,13 +189,13 @@ export default {
       }
     },
     fillDays() {
-      const parsedCalendar = this.parseCalendarTitle()
+      const parsedCalendar = DayUtil.parseCalendarTitle(this.calendarTitle)
       const year = parsedCalendar.year
       const month = parsedCalendar.month
       const indexOfWeek = new Date(year, month - 1, 1).getDay()
       const daysInMonth = MonthUtil.getEndDayInMonth(year, month)
-      const lastYearMonth = this.getRelativeYearMonth(year, month, -1)
-      const nextYearMonth = this.getRelativeYearMonth(year, month, +1)
+      const lastYearMonth = DayUtil.getRelativeYearMonth(year, month, -1)
+      const nextYearMonth = DayUtil.getRelativeYearMonth(year, month, +1)
 
       this.container = DayUtil.fillDays(
         parsedCalendar,
@@ -210,26 +209,6 @@ export default {
     },
     clearSelectedDate() {
       this.selectedDate = {}
-    },
-    parseCalendarTitle() {
-      const titleDateArray = this.calendarTitle.split(' ')
-      const year = titleDateArray[1]
-      const monthSrc = titleDateArray[0]
-      return {
-        year: parseInt(year),
-        month: MonthUtil.src2Month(monthSrc),
-        monthSrc: monthSrc
-      }
-    },
-    getRelativeYearMonth(year, month, index) {
-      if (index) {
-        month = month + index
-      }
-      const date = new Date(year, month - 1)
-      return {
-        year: date.getFullYear(),
-        month: date.getMonth() + 1
-      }
     }
   }
 }

@@ -107,4 +107,26 @@ export default class DayUtil {
 
     return container
   }
+
+  static parseCalendarTitle(calendarTitle) {
+    const titleDateArray = calendarTitle.split(' ')
+    const year = titleDateArray[1]
+    const monthSrc = titleDateArray[0]
+    return {
+      year: parseInt(year),
+      month: MonthUtil.src2Month(monthSrc),
+      monthSrc: monthSrc
+    }
+  }
+
+  static getRelativeYearMonth(year, month, index) {
+    if (index) {
+      month = month + index
+    }
+    const date = new Date(year, month - 1)
+    return {
+      year: date.getFullYear(),
+      month: date.getMonth() + 1
+    }
+  }
 }

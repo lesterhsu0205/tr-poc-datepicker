@@ -1,22 +1,37 @@
+import MonthUtil from './monthUtil'
 import CalendarDate from './calenderDate'
 
 export default class YearUtil {
-  static fillYears(selectDate) {
+  static fillYears(yearBound, selectDate) {
     let container = [[], [], []]
 
-    for (let i = 0, month = 1; i < 3 || month < this.months.length + 1; i++) {
-      for (let j = 0; j < 4; j++, month++) {
-        container[i][j] = new CalenderDate(
-          selectDate.year,
-          month,
-          this.month2Src(month),
-          selectDate.day,
-          'black',
-          Object.is(month, selectDate.month)
+    for (
+      let i = 0, year = yearBound.lower;
+      i < 3 || year < yearBound.upper + 1;
+      i++
+    ) {
+      for (let j = 0; j < 4; j++, year++) {
+        container[i][j] = new CalendarDate(
+          year,
+          1,
+          MonthUtil.month2Src(1),
+          1,
+          Object.is(year, yearBound.lower) || Object.is(year, yearBound.upper)
+            ? 'gray'
+            : 'black',
+          Object.is(year, selectDate.year)
         )
       }
     }
 
     return container
+  }
+
+  static getYearBound(year) {
+    const remainder = year % 10
+    return {
+      upper: 10 - remainder + year,
+      lower: -1 - remainder + year
+    }
   }
 }
