@@ -1,6 +1,6 @@
 <template>
   <div>
-    <input type="text" :value="value" @input="update" @click="openDatePicker" />
+    <input type="text" :value="value" @input="update" @focus="openDatePicker" />
     <div v-if="isShowDatepicker" class="date-picker">
       <div class="calender">
         <table>
@@ -82,9 +82,14 @@ export default {
   },
   watch: {
     value: {
-      handler: function(val) {
-        if (val && val.length > 0) {
+      handler: function(newVal, oldVal) {
+        if (newVal && newVal.length > 0 && !Object.is(newVal, oldVal)) {
+          console.log('watch')
           this.openDatePicker()
+          this.processInputHandler()
+          // if (Object.is(newVal.split('-').length, 3)) {
+          //   this.closeDatepicker()
+          // }
         }
       },
       deep: true
@@ -92,7 +97,11 @@ export default {
   },
   mounted: function() {
     this.today = new Date()
-    this.refreshSelectedDate(this.today)
+    this.refreshSelectedDate(
+      this.today.getFullYear(),
+      this.today.getMonth() + 1,
+      this.today.getDate()
+    )
     this.replacePage('day', this.selectedDate)
   },
   methods: {
@@ -104,17 +113,21 @@ export default {
     },
     openDatePicker() {
       this.isShowDatepicker = true
-
+    },
+    processInputHandler() {
       const thisInput = this.value
       if (thisInput && thisInput.length > 0) {
         const input = thisInput.split('-')
 
         if (input instanceof Array) {
           if (input[0]) {
+            this.selectedDate.year = parseInt(input[0])
             this.replacePage('year', { year: parseInt(input[0]) })
           }
 
           if (input[1]) {
+            this.selectedDate.year = parseInt(input[0])
+            this.selectedDate.month = parseInt(input[1])
             this.replacePage('month', {
               year: parseInt(input[0]),
               month: parseInt(input[1])
@@ -123,17 +136,11 @@ export default {
 
           if (input[2]) {
             this.refreshSelectedDate(
-              new Date(
-                parseInt(input[0]),
-                parseInt(input[1]) - 1,
-                parseInt(input[2])
-              )
+              parseInt(input[0]),
+              parseInt(input[1]),
+              parseInt(input[2])
             )
             this.replacePage('day', this.selectedDate)
-            this.$emit(
-              'input',
-              `${this.selectedDate.year}-${this.selectedDate.month}-${this.selectedDate.day}`
-            )
           }
         }
       }
@@ -234,28 +241,31 @@ export default {
         }
         this.replacePage('day', refDate)
       } else if (Object.is(this.pageMode, 'day')) {
-        const toogleDate = new Date(
+        this.refreshSelectedDate(
           calendarDate.year,
-          calendarDate.month - 1,
+          calendarDate.month,
           calendarDate.day
         )
-        this.refreshSelectedDate(toogleDate)
         this.$emit(
           'input',
           `${this.selectedDate.year}-${this.selectedDate.month}-${this.selectedDate.day}`
         )
-        this.closeDatepicker()
       }
     },
-    refreshSelectedDate(date) {
-      if (date instanceof Date) {
-        this.selectedDate.year = date.getFullYear()
-        this.selectedDate.month = date.getMonth() + 1
+    refreshSelectedDate(y, m, d) {
+      if (y) {
+        this.selectedDate.year = y
+      }
+
+      if (m) {
+        this.selectedDate.month = m
         this.selectedDate.monthSrc = MonthUtil.month2Src(
           this.selectedDate.month
         )
-        this.selectedDate.day = date.getDate()
-        this.selectedDate.dayOfTheWeek = date.getDay() // Sunday - Saturday : 0 - 6
+      }
+
+      if (d) {
+        this.selectedDate.day = d
       }
     },
     fillDays() {
