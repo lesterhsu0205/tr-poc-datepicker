@@ -98,10 +98,18 @@ export default {
       if (Object.is('year', targetMode)) {
         const bound = YearUtil.getYearBound(refDate.year)
         this.calendarTitle = `${bound.lower} - ${bound.upper}`
-        this.container = YearUtil.fillYears(bound, this.selectedDate)
+        this.container = YearUtil.fillYears(
+          bound,
+          this.selectedDate,
+          this.today
+        )
       } else if (Object.is('month', targetMode)) {
         this.calendarTitle = `${refDate.year}`
-        this.container = MonthUtil.fillMonths(refDate, this.selectedDate)
+        this.container = MonthUtil.fillMonths(
+          refDate,
+          this.selectedDate,
+          this.today
+        )
       } else if (Object.is('day', targetMode)) {
         this.calendarTitle = `${MonthUtil.month2Src(refDate.month)} ${
           refDate.year

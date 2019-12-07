@@ -2,7 +2,7 @@ import MonthUtil from './monthUtil'
 import CalendarDate from './calenderDate'
 
 export default class YearUtil {
-  static fillYears(yearBound, selectDate) {
+  static fillYears(yearBound, selectDate, today) {
     let container = [[], [], []]
 
     for (
@@ -16,9 +16,7 @@ export default class YearUtil {
           1,
           MonthUtil.month2Src(1),
           1,
-          Object.is(year, yearBound.lower) || Object.is(year, yearBound.upper)
-            ? 'gray'
-            : 'black',
+          this.isTodayYear(yearBound, today, year),
           Object.is(year, selectDate.year)
         )
       }
@@ -33,5 +31,14 @@ export default class YearUtil {
       upper: 10 - remainder + year,
       lower: -1 - remainder + year
     }
+  }
+
+  static isTodayYear(yearBound, today, compareYear) {
+    return Object.is(compareYear, today.getFullYear())
+      ? '#db3d44'
+      : Object.is(compareYear, yearBound.lower) ||
+        Object.is(compareYear, yearBound.upper)
+      ? 'gray'
+      : 'black'
   }
 }

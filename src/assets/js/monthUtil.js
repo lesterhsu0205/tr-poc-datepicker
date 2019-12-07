@@ -16,7 +16,7 @@ export default class MonthUtil {
     { Dec: 31 }
   ]
 
-  static fillMonths(refDate, selectedDate) {
+  static fillMonths(refDate, selectedDate, today) {
     let container = [[], [], []]
     for (let i = 0, month = 1; i < 3 || month < this.months.length + 1; i++) {
       for (let j = 0; j < 4; j++, month++) {
@@ -25,9 +25,8 @@ export default class MonthUtil {
           month,
           this.month2Src(month),
           1,
-          'black',
-          Object.is(month, selectedDate.month) &&
-            Object.is(refDate.year, selectedDate.year)
+          this.isTodayMonth(refDate, today, month),
+          this.isSelectedMonth(refDate, selectedDate, month)
         )
       }
     }
@@ -50,5 +49,19 @@ export default class MonthUtil {
     return Object.is(year % 4, 0) && Object.is(month, 2)
       ? Object.values(this.months[month - 1])[0] + 1
       : Object.values(this.months[month - 1])[0]
+  }
+
+  static isTodayMonth(refDate, today, conpareMonth) {
+    return Object.is(conpareMonth, today.getMonth() + 1) &&
+      Object.is(refDate.year, today.getFullYear())
+      ? '#db3d44'
+      : 'black'
+  }
+
+  static isSelectedMonth(refDate, selectedDate, conpareMonth) {
+    return (
+      Object.is(conpareMonth, selectedDate.month) &&
+      Object.is(refDate.year, selectedDate.year)
+    )
   }
 }
