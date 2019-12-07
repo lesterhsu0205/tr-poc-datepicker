@@ -1,6 +1,7 @@
 <template>
   <div id="app">
-    <DatePicker></DatePicker>
+    <DatePicker v-model="date" />
+    {{ date }}
   </div>
 </template>
 
@@ -11,6 +12,11 @@ export default {
   name: 'App',
   components: {
     DatePicker
+  },
+  data: function() {
+    return {
+      date: null
+    }
   }
 }
 </script>

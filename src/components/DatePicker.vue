@@ -1,7 +1,7 @@
 <template>
   <div>
-    {{ `${selectedDate.year}-${selectedDate.month}-${selectedDate.day}` }}
-    <div class="date-picker">
+    <input type="text" :value="value" @input="update" @click="openDatePicker" />
+    <div v-if="isShowDatepicker" class="date-picker">
       <div class="calender">
         <table>
           <thead>
@@ -65,7 +65,7 @@ import CalenderDate from './../assets/js/calenderDate'
 
 export default {
   props: {
-    message: {
+    value: {
       type: String,
       default: null
     }
@@ -76,14 +76,18 @@ export default {
       today: null,
       pageMode: null,
       selectedDate: {},
-      container: null
+      container: null,
+      isShowDatepicker: false
     }
   },
   watch: {
-    message: function(val) {
-      if (val && val.length > 0) {
-        this.alertMessage()
-      }
+    value: {
+      handler: function(val) {
+        if (val && val.length > 0) {
+          this.openDatePicker()
+        }
+      },
+      deep: true
     }
   },
   mounted: function() {
@@ -92,6 +96,48 @@ export default {
     this.replacePage('day', this.selectedDate)
   },
   methods: {
+    update(e) {
+      this.$emit('input', e.target.value)
+    },
+    closeDatepicker() {
+      this.isShowDatepicker = false
+    },
+    openDatePicker() {
+      this.isShowDatepicker = true
+
+      const thisInput = this.value
+      if (thisInput && thisInput.length > 0) {
+        const input = thisInput.split('-')
+
+        if (input instanceof Array) {
+          if (input[0]) {
+            this.replacePage('year', { year: parseInt(input[0]) })
+          }
+
+          if (input[1]) {
+            this.replacePage('month', {
+              year: parseInt(input[0]),
+              month: parseInt(input[1])
+            })
+          }
+
+          if (input[2]) {
+            this.refreshSelectedDate(
+              new Date(
+                parseInt(input[0]),
+                parseInt(input[1]) - 1,
+                parseInt(input[2])
+              )
+            )
+            this.replacePage('day', this.selectedDate)
+            this.$emit(
+              'input',
+              `${this.selectedDate.year}-${this.selectedDate.month}-${this.selectedDate.day}`
+            )
+          }
+        }
+      }
+    },
     replacePage(targetMode, refDate) {
       this.pageMode = targetMode
 
@@ -194,6 +240,11 @@ export default {
           calendarDate.day
         )
         this.refreshSelectedDate(toogleDate)
+        this.$emit(
+          'input',
+          `${this.selectedDate.year}-${this.selectedDate.month}-${this.selectedDate.day}`
+        )
+        this.closeDatepicker()
       }
     },
     refreshSelectedDate(date) {
