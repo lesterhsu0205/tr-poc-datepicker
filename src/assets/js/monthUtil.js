@@ -26,7 +26,8 @@ export default class MonthUtil {
           this.month2Src(month),
           1,
           'black',
-          Object.is(month, selectedDate.month)
+          Object.is(month, selectedDate.month) &&
+            Object.is(refDate.year, selectedDate.year)
         )
       }
     }
