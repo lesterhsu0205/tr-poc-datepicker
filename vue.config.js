@@ -2,15 +2,14 @@ const webpack = require('webpack')
 const path = require('path')
 
 module.exports = {
+  publicPath: './',
   devServer: {
-    contentBase: path.join(__dirname, 'dist'),
     compress: true,
     port: 9000,
     overlay: {
       warnings: true,
       errors: true
     }
-    // https: true
   },
 
   // module: {
