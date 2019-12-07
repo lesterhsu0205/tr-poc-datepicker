@@ -31,7 +31,7 @@
               <td
                 v-for="(calendarDate, j) in rowData"
                 :key="j"
-                :class="calendarDate.isActive ? 'focus' : ''"
+                :class="{ active: calendarDate.isActive }"
                 @click="toggle(calendarDate)"
               >
                 <span

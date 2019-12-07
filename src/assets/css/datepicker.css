@@ -39,7 +39,7 @@ tbody > tr > td {
   cursor: pointer;
 }
 
-tbody > tr > td.focus:before,
+tbody > tr > td.active:before,
 tbody > tr > td:hover:before {
   position: absolute;
   content: '';
@@ -52,7 +52,7 @@ tbody > tr > td:hover:before {
   z-index: 11;
 }
 
-tbody > tr > td.focus > .day,
+tbody > tr > td.active > .day,
 tbody > tr > td:hover > .day {
   position: relative;
   color: white !important;
