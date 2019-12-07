@@ -1,6 +1,12 @@
 <template>
   <div>
-    <input type="text" :value="value" @input="update" @focus="openDatePicker" />
+    <input
+      type="text"
+      :value="value"
+      @input="updateBinding"
+      @focus="openDatePicker"
+      @blur="verifyBlur"
+    />
     <div v-if="isShowDatepicker" class="date-picker">
       <div class="calender">
         <table>
@@ -77,19 +83,22 @@ export default {
       pageMode: null,
       selectedDate: {},
       container: null,
-      isShowDatepicker: false
+      isShowDatepicker: false,
+      isCheckSelected: false
     }
   },
   watch: {
     value: {
       handler: function(newVal, oldVal) {
         if (newVal && newVal.length > 0 && !Object.is(newVal, oldVal)) {
-          console.log('watch')
           this.openDatePicker()
           this.processInputHandler()
-          // if (Object.is(newVal.split('-').length, 3)) {
-          //   this.closeDatepicker()
-          // }
+          if (Object.is(this.isCheckSelected, true)) {
+            this.closeDatepicker()
+            this.isCheckSelected = false
+          }
+        } else {
+          this.closeDatepicker()
         }
       },
       deep: true
@@ -105,8 +114,13 @@ export default {
     this.replacePage('day', this.selectedDate)
   },
   methods: {
-    update(e) {
+    updateBinding(e) {
       this.$emit('input', e.target.value)
+    },
+    verifyBlur(e) {
+      // if (Object.is(this.isCheckSelected, true)) {
+      //   this.closeDatepicker()
+      // }
     },
     closeDatepicker() {
       this.isShowDatepicker = false
@@ -250,6 +264,7 @@ export default {
           'input',
           `${this.selectedDate.year}-${this.selectedDate.month}-${this.selectedDate.day}`
         )
+        this.isCheckSelected = true
       }
     },
     refreshSelectedDate(y, m, d) {
@@ -286,9 +301,6 @@ export default {
         this.today,
         this.selectedDate
       )
-    },
-    clearSelectedDate() {
-      this.selectedDate = {}
     }
   }
 }
