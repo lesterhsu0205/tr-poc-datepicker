@@ -3,6 +3,7 @@ const path = require('path')
 
 module.exports = {
   publicPath: './',
+  productionSourceMap: false,
   devServer: {
     compress: true,
     port: 9000,
