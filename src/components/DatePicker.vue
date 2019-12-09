@@ -84,15 +84,19 @@ export default {
       selectedDate: {},
       container: null,
       isShowDatepicker: false,
-      isCheckSelected: false
+      isCheckSelected: false,
+      yyyyMMdd: new RegExp(
+        /^[1-9]\d{2,3}-((0[1-9]|[1-9])|1[0-2])-((0[1-9]|[1-9])|[1-2][0-9]|3[0-1])$/
+      ),
+      yyyyMM: new RegExp(/^[1-9]\d{2,3}-((0[1-9]|[1-9])|1[0-2])$/),
+      yyyy: new RegExp(/^[1-9]\d{2,3}$/)
     }
   },
   watch: {
     value: {
       handler: function(newVal, oldVal) {
-        if (newVal && newVal.length > 0 && !Object.is(newVal, oldVal)) {
+        if (!this.isBlank(newVal) && !Object.is(newVal, oldVal)) {
           this.openDatePicker()
-          this.processInputHandler()
           if (Object.is(this.isCheckSelected, true)) {
             this.closeDatepicker()
             this.isCheckSelected = false
@@ -127,35 +131,29 @@ export default {
     },
     openDatePicker() {
       this.isShowDatepicker = true
-    },
-    processInputHandler() {
       const thisInput = this.value
-      if (thisInput && thisInput.length > 0) {
-        const input = thisInput.split('-')
+      if (!this.isBlank(thisInput)) {
+        thisInput.includes('-')
 
-        if (input instanceof Array) {
-          if (input[0]) {
-            this.selectedDate.year = parseInt(input[0])
-            this.replacePage('year', { year: parseInt(input[0]) })
-          }
-
-          if (input[1]) {
-            this.selectedDate.year = parseInt(input[0])
-            this.selectedDate.month = parseInt(input[1])
-            this.replacePage('month', {
-              year: parseInt(input[0]),
-              month: parseInt(input[1])
-            })
-          }
-
-          if (input[2]) {
-            this.refreshSelectedDate(
-              parseInt(input[0]),
-              parseInt(input[1]),
-              parseInt(input[2])
-            )
-            this.replacePage('day', this.selectedDate)
-          }
+        if (this.yyyy.test(thisInput)) {
+          this.selectedDate.year = parseInt(thisInput)
+          this.replacePage('year', { year: this.selectedDate.year })
+        } else if (this.yyyyMM.test(thisInput)) {
+          const input = thisInput.split('-')
+          this.selectedDate.year = parseInt(input[0])
+          this.selectedDate.month = parseInt(input[1])
+          this.replacePage('month', {
+            year: this.selectedDate.year,
+            month: this.selectedDate.month
+          })
+        } else if (this.yyyyMMdd.test(thisInput)) {
+          const input = thisInput.split('-')
+          this.refreshSelectedDate(
+            parseInt(input[0]),
+            parseInt(input[1]),
+            parseInt(input[2])
+          )
+          this.replacePage('day', this.selectedDate)
         }
       }
     },
@@ -301,6 +299,9 @@ export default {
         this.today,
         this.selectedDate
       )
+    },
+    isBlank(value) {
+      return (_.isEmpty(value) && !_.isNumber(value)) || _.isNaN(value)
     }
   }
 }

@@ -35,6 +35,7 @@ module.exports = {
     // devtool: 'source-map',
     plugins: [
       new webpack.ProvidePlugin({
+        _: 'lodash'
         // $: 'jquery',
         // jQuery: 'jquery',
         // jquery: 'jquery',
