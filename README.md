@@ -34,11 +34,8 @@ yarn lint
 
 * Import component in script tag.
 
-```xml
-<script>
-```
-
 ```javascript
+<script>
   import DatePicker from './components/DatePicker'
 
   export default {
@@ -51,10 +48,7 @@ yarn lint
       }
     }
   }
-```
-
-```xml
-</script>
+  </script>
 ```
 
 * In template tag.
@@ -71,5 +65,5 @@ yarn lint
 
 Name          | Type  | Default | Description|
 --------------|:-----:|--------:| ----------:|
-v-model       | string|  null   | Two-way binding for dayte in component.|
+v-model       | string|  null   | Two-way binding for date in component.|
 
