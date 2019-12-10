@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    ${date} : {{ date }}
+    Selected Date : {{ date }}
     <DatePicker v-model="date" />
   </div>
 </template>

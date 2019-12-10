@@ -15,7 +15,10 @@
               <td @click="togglePage('left')">
                 <i class="fas fa-angle-left"></i>
               </td>
-              <td colspan="5" @click="toggleTitle">
+              <td
+                :colspan="Object.is(pageMode, 'day') ? '5' : '2'"
+                @click="toggleTitle"
+              >
                 <span class="calendarTitle"> {{ calendarTitle }} </span>
               </td>
               <td @click="togglePage('right')">
@@ -37,11 +40,14 @@
               <td
                 v-for="(calendarDate, j) in rowData"
                 :key="j"
-                :class="{ active: calendarDate.isActive }"
+                :class="{
+                  active: calendarDate.isActive,
+                  yearmonth: !Object.is(pageMode, 'day')
+                }"
                 @click="toggle(calendarDate)"
               >
                 <span
-                  class="day"
+                  :class="Object.is(pageMode, 'day') ? 'day' : 'yearmonth'"
                   :style="'display:block; color:' + calendarDate.color"
                   ><div v-if="Object.is(pageMode, 'day')">
                     {{ calendarDate.day }}
