@@ -48,7 +48,7 @@ yarn lint
       }
     }
   }
-  </script>
+</script>
 ```
 
 * In template tag.
