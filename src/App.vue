@@ -1,7 +1,7 @@
 <template>
   <div id="app">
+    ${date} : {{ date }}
     <DatePicker v-model="date" />
-    {{ date }}
   </div>
 </template>
 
