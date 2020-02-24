@@ -65,4 +65,4 @@ yarn lint
 
 Name          | Type  | Default | Description|
 --------------|:-----:|--------:| ----------:|
-v-model       | string|  null   | Two-way binding for date in component.|
+v-model       | string|  null   | 2-way binding for date in component.|
